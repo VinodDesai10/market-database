@@ -1,31 +1,48 @@
 {% extends "layout.html" %}
 {% block content %}
 <div class="fade-page">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="fw-bold text-gradient">Customers Overview</h2>
+  <div class="d-flex justify-content-between align-items-center mb-5">
+    <div>
+      <h2 class="text-gradient mb-1">Customers Overview</h2>
+      <p class="text-muted">Manage and track all your customer information</p>
+    </div>
     <a href="{{ url_for('add_customer') }}" class="btn btn-primary shadow-sm">+ Add Customer</a>
   </div>
 
-  <div class="card p-3 border-0 shadow-sm rounded-4">
-    <div class="card-body">
-      <table class="table table-hover align-middle">
+  <div class="card p-0 border-0">
+    <div class="card-header">
+      <h5 class="mb-0">Customer Directory</h5>
+    </div>
+    <div class="card-body p-0">
+      {% if customers %}
+      <table class="table table-hover align-middle mb-0">
         <thead>
           <tr>
             <th>Customer ID</th>
             <th>Name</th>
             <th>Address</th>
+            <th style="width: 120px;">Actions</th>
           </tr>
         </thead>
         <tbody>
           {% for customer in customers %}
           <tr>
-            <td>{{ customer.customer_id }}</td>
+            <td><span style="font-weight: 600; color: var(--primary);">{{ customer.customer_id }}</span></td>
             <td>{{ customer.customer_name }}</td>
             <td>{{ customer.customer_address }}</td>
+            <td>
+              <a href="{{ url_for('edit_customer', id=customer.customer_id) }}" class="btn btn-sm btn-info">View</a>
+            </td>
           </tr>
           {% endfor %}
         </tbody>
       </table>
+      {% else %}
+      <div style="padding: 3rem; text-align: center;">
+        <p class="text-muted mb-3">No customers found yet</p>
+        <a href="{{ url_for('add_customer') }}" class="btn btn-primary">Add Your First Customer</a>
+      </div>
+      {% endif %}
     </div>
   </div>
 </div>
