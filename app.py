@@ -238,7 +238,6 @@ def submit_supply_form():
 
     return redirect(url_for('supply_form'))
 
-
 # --- 6. "ADD NEW..." FORMS (CREATE DATA) ---
 
 @app.route('/add_customer', methods=['GET', 'POST'])
@@ -377,7 +376,7 @@ def add_product():
     return render_template('add_product.html')
 
 
-# --- 7. "UPDATE" WORKFLOW (This is the new section) ---
+# --- 7. "UPDATE" WORKFLOW ---
 
 @app.route('/update', methods=['GET', 'POST'])
 def update_search():
@@ -609,7 +608,43 @@ def update_product(id):
             conn.close()
         return redirect(url_for('products_list'))
 
+# --- 8. NEW PAYMENT ROUTES ---
 
-# --- 8. RUN THE APPLICATION ---
+@app.route('/payment')
+def make_payment_form():
+    """Shows the form to make a new payment."""
+    return render_template('make_payment.html')
+
+@app.route('/submit_payment', methods=['POST'])
+def submit_payment():
+    """Processes the new payment submission."""
+    conn = get_db_connection()
+    if not conn:
+        return "<h1>Error: Could not connect to the database.</h1>", 500
+    
+    # Get data from form
+    payment_id = request.form.get('payment_id')
+    order_id = request.form.get('order_id')
+    payment_amount = request.form.get('payment_amount')
+    
+    cursor = conn.cursor()
+    try:
+        # This will automatically be checked by your 'before_payment_insert' TRIGGER
+        query = "INSERT INTO payment (payment_id, order_id, payment_amount, payment_date) VALUES (%s, %s, %s, CURDATE())"
+        cursor.execute(query, (payment_id, order_id, payment_amount))
+        conn.commit()
+        flash('Payment processed successfully!', 'success')
+    except mysql.connector.Error as err:
+        # This will catch the error message from your trigger!
+        conn.rollback()
+        flash(f'Payment Failed: {err.msg}', 'danger')
+    finally:
+        cursor.close()
+        conn.close()
+        
+    return redirect(url_for('make_payment_form'))
+
+
+# --- 9. RUN THE APPLICATION ---
 if __name__ == '__main__':
     app.run(debug=True)
