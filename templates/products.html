@@ -1,0 +1,38 @@
+<!-- This new file shows the list of all products -->
+{% extends 'layout.html' %}
+
+{% block content %}
+    <h1 class="mb-4">Products</h1>
+    <div class="card">
+        <div class="card-body">
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th scope="col">Product ID</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Category</th>
+                        <th scope="col">Price (per unit)</th>
+                        <th scope="col">Total Stock</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                    <tr>
+                        <th scope="row">{{ product.product_id }}</th>
+                        <td>{{ product.product_name }}</td>
+                        <td>{{ product.category }}</td>
+                        <td>{{ "₹{:,.2f}".format(product.product_price) }}</td>
+                        <!-- This 'total_stock' comes from the SUM() in your app.py -->
+                        <td>{{ product.total_stock }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center">No products found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
+
