@@ -1,110 +1,292 @@
+/* ===================================================
+   🎯 MARKET DB - ADVANCED INTERACTIONS & ANIMATIONS
+   =================================================== */
+
 document.addEventListener("DOMContentLoaded", () => {
+  console.log("[v0] Initializing dashboard animations and interactions")
 
   /* =============================
-     🎯 SIDEBAR ACTIVE LINK LOGIC
+     🔗 SIDEBAR ACTIVE LINK LOGIC
      ============================= */
-  const links = document.querySelectorAll(".sidebar .nav-link");
-  const currentPath = window.location.pathname;
+  const sidebarLinks = document.querySelectorAll(".sidebar-link")
+  const currentPath = window.location.pathname
 
-  links.forEach(link => {
-    const linkPath = link.getAttribute("href");
-
-    // ✅ Match only the correct current section
+  sidebarLinks.forEach((link) => {
+    const linkPath = link.getAttribute("href")
     if (currentPath === linkPath || currentPath.startsWith(linkPath + "/")) {
-      link.classList.add("active");
+      link.classList.add("active")
     } else {
-      link.classList.remove("active");
+      link.classList.remove("active")
     }
 
-    // Active highlight on click
     link.addEventListener("click", () => {
-      links.forEach(l => l.classList.remove("active"));
-      link.classList.add("active");
-
-      // Glow effect for click
-      link.classList.add("glow");
-      setTimeout(() => link.classList.remove("glow"), 500);
-    });
-  });
+      sidebarLinks.forEach((l) => l.classList.remove("active"))
+      link.classList.add("active")
+    })
+  })
 
   /* =============================
-     🌊 BUTTON RIPPLE EFFECT
+     ✨ RIPPLE EFFECT ON BUTTONS
      ============================= */
-  document.querySelectorAll("button, .btn").forEach(btn => {
-    btn.addEventListener("click", function (e) {
-      const circle = document.createElement("span");
-      circle.classList.add("ripple");
-      const rect = this.getBoundingClientRect();
-      circle.style.left = `${e.clientX - rect.left}px`;
-      circle.style.top = `${e.clientY - rect.top}px`;
-      this.appendChild(circle);
-      setTimeout(() => circle.remove(), 600);
-    });
-  });
+  function addRippleEffect(element) {
+    element.addEventListener("click", function (e) {
+      const ripple = document.createElement("span")
+      ripple.classList.add("ripple")
+
+      const rect = this.getBoundingClientRect()
+      const x = e.clientX - rect.left
+      const y = e.clientY - rect.top
+
+      ripple.style.left = x + "px"
+      ripple.style.top = y + "px"
+      ripple.style.width = ripple.style.height = "12px"
+
+      this.appendChild(ripple)
+
+      setTimeout(() => ripple.remove(), 800)
+    })
+  }
+
+  document.querySelectorAll(".btn, .nav-btn, .nav-link").forEach(addRippleEffect)
 
   /* =============================
-     🌫️ PAGE FADE-OUT TRANSITION
+     🌊 PAGE TRANSITION ANIMATION
      ============================= */
-  const pageLinks = document.querySelectorAll("a[href]");
-  pageLinks.forEach(link => {
-    if (link.hostname === window.location.hostname) {
-      link.addEventListener("click", e => {
-        const target = e.currentTarget.getAttribute("href");
-        if (!target || target.startsWith("#") || target.startsWith("javascript")) return;
-        e.preventDefault();
-        document.body.classList.add("fade-out");
-        setTimeout(() => { window.location = target; }, 200);
-      });
+  const internalLinks = document.querySelectorAll("a[href]")
+  internalLinks.forEach((link) => {
+    if (link.hostname === window.location.hostname && !link.href.includes("#")) {
+      link.addEventListener("click", (e) => {
+        if (!link.hasAttribute("data-bs-toggle")) {
+          e.preventDefault()
+          document.body.classList.add("fade-out")
+          setTimeout(() => {
+            window.location = link.href
+          }, 300)
+        }
+      })
     }
-  });
+  })
 
   /* =============================
-     🪄 SMOOTH SCROLL ON LOAD
+     📊 TABLE ROW INTERSECTION ANIMATION
      ============================= */
-  window.scrollTo({ top: 0, behavior: "smooth" });
-});
+  const tableRows = document.querySelectorAll(".table tbody tr")
+  if (tableRows.length > 0 && "IntersectionObserver" in window) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry, index) => {
+          if (entry.isIntersecting) {
+            entry.target.style.animation = `fadeInUp 0.5s ease-out ${index * 0.08}s both`
+            observer.unobserve(entry.target)
+          }
+        })
+      },
+      { threshold: 0.1 },
+    )
+
+    tableRows.forEach((row) => observer.observe(row))
+  }
+
+  /* =============================
+     🎨 CARD ENTRANCE ANIMATIONS
+     ============================= */
+  const cards = document.querySelectorAll(".card")
+  if (cards.length > 0 && "IntersectionObserver" in window) {
+    const cardObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry, index) => {
+          if (entry.isIntersecting) {
+            entry.target.style.animation = `slideInUp 0.6s ease-out ${index * 0.1}s both`
+            cardObserver.unobserve(entry.target)
+          }
+        })
+      },
+      { threshold: 0.1 },
+    )
+
+    cards.forEach((card) => cardObserver.observe(card))
+  }
+
+  /* =============================
+     🔔 TOAST AUTO-DISMISS
+     ============================= */
+  const toasts = document.querySelectorAll(".toast-notification")
+  toasts.forEach((toast) => {
+    setTimeout(() => {
+      toast.style.animation = "fadeOut 0.5s ease-out forwards"
+      setTimeout(() => toast.remove(), 500)
+    }, 5000)
+  })
+
+  /* =============================
+     🎯 FORM FIELD FOCUS EFFECTS
+     ============================= */
+  const formControls = document.querySelectorAll(".form-control, .form-select, .form-check-input")
+  formControls.forEach((control) => {
+    control.addEventListener("focus", function () {
+      const parent = this.closest(".form-group") || this.closest(".mb-3") || this.parentElement
+      if (parent) {
+        parent.classList.add("focused")
+      }
+      // Ensure focus styling is maintained
+      this.style.boxShadow = "0 0 0 3px rgba(6, 182, 212, 0.25), inset 0 0 0 1px rgba(6, 182, 212, 0.4)"
+    })
+
+    control.addEventListener("blur", function () {
+      const parent = this.closest(".form-group") || this.closest(".mb-3") || this.parentElement
+      if (parent) {
+        parent.classList.remove("focused")
+      }
+    })
+
+    control.addEventListener("input", function () {
+      if (document.activeElement === this) {
+        this.style.boxShadow = "0 0 0 3px rgba(6, 182, 212, 0.25), inset 0 0 0 1px rgba(6, 182, 212, 0.4)"
+      }
+    })
+  })
+
+  /* =============================
+     💫 SCROLL-TO-TOP SMOOTH BEHAVIOR
+     ============================= */
+  window.addEventListener("load", () => {
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  })
+
+  /* =============================
+     🔽 DROPDOWN CLOSE ON OUTSIDE CLICK
+     ============================= */
+  document.addEventListener("click", (e) => {
+    const dropdowns = document.querySelectorAll(".dropdown-glass")
+    dropdowns.forEach((dropdown) => {
+      if (!dropdown.parentElement.contains(e.target)) {
+        // Close dropdown - Bootstrap handles this automatically
+      }
+    })
+  })
+
+  /* =============================
+     ✨ SMOOTH DROPDOWN TRANSITIONS
+     ============================= */
+  const dropdownButtons = document.querySelectorAll("[data-bs-toggle='dropdown']")
+  dropdownButtons.forEach((button) => {
+    button.addEventListener("shown.bs.dropdown", function () {
+      const dropdown = this.nextElementSibling
+      if (dropdown && dropdown.classList.contains("dropdown-glass")) {
+        dropdown.style.animation = "slideDownDropdown 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)"
+      }
+    })
+  })
+
+  /* =============================
+     🎯 RIGHT SIDEBAR MENU TOGGLE FUNCTIONALITY
+     ============================= */
+  const sidebarToggle = document.getElementById("sidebarToggle")
+  const rightSidebar = document.getElementById("rightSidebar")
+  const closeSidebarBtn = document.getElementById("closeSidebar")
+  let sidebarOverlay = document.querySelector(".sidebar-overlay")
+
+  // Create overlay if it doesn't exist
+  if (!sidebarOverlay) {
+    sidebarOverlay = document.createElement("div")
+    sidebarOverlay.className = "sidebar-overlay"
+    document.body.appendChild(sidebarOverlay)
+  }
+
+  // Toggle sidebar
+  if (sidebarToggle) {
+    sidebarToggle.addEventListener("click", () => {
+      rightSidebar.classList.toggle("active")
+      sidebarOverlay.classList.toggle("active")
+    })
+  }
+
+  // Close sidebar
+  if (closeSidebarBtn) {
+    closeSidebarBtn.addEventListener("click", () => {
+      rightSidebar.classList.remove("active")
+      sidebarOverlay.classList.remove("active")
+    })
+  }
+
+  // Close sidebar when clicking overlay
+  sidebarOverlay.addEventListener("click", () => {
+    rightSidebar.classList.remove("active")
+    sidebarOverlay.classList.remove("active")
+  })
+
+  // Close sidebar when clicking a link
+  const rightNavItems = document.querySelectorAll(".right-nav-item")
+  rightNavItems.forEach((item) => {
+    item.addEventListener("click", () => {
+      rightSidebar.classList.remove("active")
+      sidebarOverlay.classList.remove("active")
+    })
+  })
+
+  console.log("[v0] Dashboard initialized successfully")
+})
 
 /* =============================
-   ✨ DYNAMIC STYLE INJECTION
+   🌐 INJECT ADVANCED CSS ANIMATIONS
    ============================= */
-(function injectCSS() {
+;(function injectAdvancedCSS() {
   const css = `
-  /* Ripple */
-  .ripple {
-    position: absolute;
-    width: 12px;
-    height: 12px;
-    background: rgba(255,255,255,0.45);
-    border-radius: 50%;
-    transform: translate(-50%, -50%) scale(0.8);
-    animation: rippleAni .6s ease forwards;
-    pointer-events: none;
-  }
+    @keyframes slideInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
 
-  @keyframes rippleAni {
-    to { transform: translate(-50%, -50%) scale(10); opacity: 0; }
-  }
+    @keyframes fadeOut {
+      from {
+        opacity: 1;
+      }
+      to {
+        opacity: 0;
+      }
+    }
 
-  /* Active link click glow */
-  .sidebar .nav-link.glow {
-    box-shadow: 0 0 12px rgba(124,58,237,0.6);
-    transition: box-shadow 0.3s ease;
-  }
+    @keyframes shimmer {
+      0% {
+        background-position: -1000px 0;
+      }
+      100% {
+        background-position: 1000px 0;
+      }
+    }
 
-  /* Page fade-out transition */
-  body.fade-out {
-    opacity: 0;
-    transform: scale(0.98);
-    transition: all 0.25s ease;
-  }
+    .loader {
+      background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.1),
+        rgba(255, 255, 255, 0.3),
+        rgba(255, 255, 255, 0.1)
+      );
+      background-size: 1000px 100%;
+      animation: shimmer 2s infinite;
+    }
 
-  /* Buttons setup */
-  .btn, button {
-    position: relative;
-    overflow: hidden;
-  }
-  `;
-  const s = document.createElement("style");
-  s.appendChild(document.createTextNode(css));
-  document.head.appendChild(s);
-})();
+    /* Smooth scrolling */
+    html {
+      scroll-behavior: smooth;
+    }
+
+    /* Disable animations for users who prefer reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation: none !important;
+        transition: none !important;
+      }
+    }
+  `
+
+  const style = document.createElement("style")
+  style.appendChild(document.createTextNode(css))
+  document.head.appendChild(style)
+})()

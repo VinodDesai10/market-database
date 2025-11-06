@@ -3,83 +3,169 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Market DB</title>
+    <title>Market DB - Dashboard</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Added modern font with Tailwind-ready weights -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
-<body>
-    <!-- NAVBAR -->
-    <nav class="navbar navbar-expand-lg navbar-glass sticky-top">
-        <div class="container-fluid">
-            <a class="navbar-brand d-flex align-items-center" href="{{ url_for('index') }}">
-                <div class="brand-mark">M</div>
-                <span class="ms-3">Market DB</span>
+<body class="dashboard-body">
+    <!-- NAVBAR WITH GLASSMORPHISM -->
+    <nav class="navbar navbar-glass sticky-top">
+        <div class="container-fluid navbar-container">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <!-- Redesigned brand mark with gradient glow -->
+                <div class="brand-mark">
+                    <span>📊</span>
+                </div>
+                <span class="brand-text">Market DB</span>
             </a>
-            <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
+            
+            <button class="navbar-toggler glass-toggler" id="sidebarToggle" type="button">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
             </button>
+            
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto gap-2">
-                    <!-- Add Dropdown -->
-                    <li class="nav-item dropdown">
-                        <a class="btn btn-soft" data-bs-toggle="dropdown">+ Add New</a>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="{{ url_for('add_customer') }}">Add Customer</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('add_vendor') }}">Add Vendor</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('add_farmer') }}">Add Farmer</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('add_product') }}">Add Product</a></li>
-                        </ul>
-                    </li>
-
-                    <li><a class="btn btn-outline" href="{{ url_for('update_search') }}">Update Item</a></li>
-                    <li><a class="btn btn-outline text-danger" href="{{ url_for('delete_record') }}">Delete Record</a></li>
-                    <li><a class="btn btn-outline" href="{{ url_for('order_form') }}">Place Order</a></li>
-                    <li><a class="btn btn-outline" href="{{ url_for('make_payment_form') }}">Make Payment</a></li>
-                    <li><a class="btn btn-cta" href="{{ url_for('supply_form') }}">Restock</a></li>
-                </ul>
+                <ul class="navbar-nav ms-auto gap-2 nav-actions"></ul>
             </div>
         </div>
     </nav>
 
     <!-- MAIN LAYOUT -->
-    <div class="container-fluid">
-        <div class="row">
-            <!-- SIDEBAR -->
-            <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block sidebar collapse">
-                <div class="position-sticky sidebar-inner">
-                    <ul class="nav flex-column nav-pills">
-                        <li class="small text-muted">Data Management</li>
-                        <li><a class="nav-link" data-path="/" href="{{ url_for('index') }}">Customers</a></li>
-                        <li><a class="nav-link" data-path="/vendors" href="{{ url_for('vendors_list') }}">Vendors</a></li>
-                        <li><a class="nav-link" data-path="/products" href="{{ url_for('products_list') }}">Products</a></li>
-                        <li><a class="nav-link" data-path="/farmers" href="{{ url_for('farmers_list') }}">Farmers</a></li>
-                        
-                        <li class="small text-muted">Reports</li>
-                        <li><a class="nav-link" data-path="/customer_orders" href="{{ url_for('customer_orders') }}">Customer Orders</a></li>
-                        <li><a class="nav-link" data-path="/vendor_inventory" href="{{ url_for('vendor_inventory') }}">Vendor Inventory</a></li>
+    <div class="dashboard-layout">
+        <!-- SIDEBAR -->
+        <nav id="sidebarMenu" class="sidebar-glass">
+            <div class="sidebar-header">
+                <h6 class="sidebar-title">Menu</h6>
+            </div>
+            <div class="sidebar-inner">
+                <div class="nav-section">
+                    <h6 class="nav-section-title">Data Management</h6>
+                    <ul class="nav nav-pills">
+                        <li class="nav-item">
+                            <a class="nav-link sidebar-link" data-path="/" href="{{ url_for('index') }}">
+                                <span class="nav-icon">👥</span>
+                                <span class="nav-text">Customers</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link sidebar-link" data-path="/vendors" href="{{ url_for('vendors_list') }}">
+                                <span class="nav-icon">🏢</span>
+                                <span class="nav-text">Vendors</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link sidebar-link" data-path="/products" href="{{ url_for('products_list') }}">
+                                <span class="nav-icon">📦</span>
+                                <span class="nav-text">Products</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link sidebar-link" data-path="/farmers" href="{{ url_for('farmers_list') }}">
+                                <span class="nav-icon">🌾</span>
+                                <span class="nav-text">Farmers</span>
+                            </a>
+                        </li>
                     </ul>
                 </div>
-            </nav>
+                
+                <div class="nav-section">
+                    <h6 class="nav-section-title">Reports</h6>
+                    <ul class="nav nav-pills">
+                        <li class="nav-item">
+                            <a class="nav-link sidebar-link" data-path="/customer_orders" href="{{ url_for('customer_orders') }}">
+                                <span class="nav-icon">📋</span>
+                                <span class="nav-text">Orders</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link sidebar-link" data-path="/vendor_inventory" href="{{ url_for('vendor_inventory') }}">
+                                <span class="nav-icon">📊</span>
+                                <span class="nav-text">Inventory</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
 
-            <!-- MAIN CONTENT -->
-            <main class="col-md-9 ms-sm-auto col-lg-10 main-content">
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                    {% if messages %}
-                        {% for category, message in messages %}
-                            <div class="alert alert-{{ category }} alert-dismissible fade show">
-                                {{ message }}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                            </div>
-                        {% endfor %}
-                    {% endif %}
-                {% endwith %}
-
-                {% block content %}{% endblock %}
-            </main>
+        <!-- CHANGE: Add right-side menu sidebar that slides in -->
+        <div id="rightSidebar" class="right-sidebar-menu">
+            <button id="closeSidebar" class="close-sidebar-btn">&times;</button>
+            <div class="right-sidebar-content">
+                <h6 class="right-sidebar-title">Quick Actions</h6>
+                <nav class="right-nav">
+                    <a href="{{ url_for('add_customer') }}" class="right-nav-item">
+                        <span class="nav-icon">👤</span>
+                        <span class="nav-text">Add Customer</span>
+                    </a>
+                    <a href="{{ url_for('add_vendor') }}" class="right-nav-item">
+                        <span class="nav-icon">🏪</span>
+                        <span class="nav-text">Add Vendor</span>
+                    </a>
+                    <a href="{{ url_for('add_farmer') }}" class="right-nav-item">
+                        <span class="nav-icon">🌾</span>
+                        <span class="nav-text">Add Farmer</span>
+                    </a>
+                    <a href="{{ url_for('add_product') }}" class="right-nav-item">
+                        <span class="nav-icon">📦</span>
+                        <span class="nav-text">Add Product</span>
+                    </a>
+                    <hr class="nav-divider">
+                    <a href="{{ url_for('update_search') }}" class="right-nav-item">
+                        <span class="nav-icon">✏️</span>
+                        <span class="nav-text">Update Record</span>
+                    </a>
+                    <a href="{{ url_for('delete_record') }}" class="right-nav-item danger">
+                        <span class="nav-icon">🗑️</span>
+                        <span class="nav-text">Delete Record</span>
+                    </a>
+                    <a href="{{ url_for('order_form') }}" class="right-nav-item">
+                        <span class="nav-icon">🛒</span>
+                        <span class="nav-text">Create Order</span>
+                    </a>
+                    <a href="{{ url_for('make_payment_form') }}" class="right-nav-item">
+                        <span class="nav-icon">💳</span>
+                        <span class="nav-text">Make Payment</span>
+                    </a>
+                    <a href="{{ url_for('supply_form') }}" class="right-nav-item accent">
+                        <span class="nav-icon">📥</span>
+                        <span class="nav-text">Restock Supply</span>
+                    </a>
+                </nav>
+            </div>
         </div>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <!-- Animated toast notifications with gradient backgrounds -->
+                        <div class="toast-notification toast-{{ category }} fade-in-up">
+                            <div class="toast-content">
+                                <span class="toast-icon">
+                                    {% if category == 'success' %}✓{% elif category == 'danger' %}✕{% elif category == 'warning' %}⚠{% else %}ℹ{% endif %}
+                                </span>
+                                <span>{{ message }}</span>
+                            </div>
+                            <button type="button" class="toast-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <!-- Page content with fade-in animation -->
+            <div class="content-wrapper fade-in-down">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
     </div>
 
     <!-- SCRIPTS -->
