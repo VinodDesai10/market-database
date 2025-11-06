@@ -1,0 +1,193 @@
+/* ===============================
+   🎨 MARKET DB - GLOBAL STYLES
+   =============================== */
+
+/* ---------- THEME VARIABLES ---------- */
+:root {
+  --accent1: #7c3aed;
+  --accent2: #06b6d4;
+  --cta: #ff7a59;
+  --muted: #94a3b8;
+  --text-dark: #102a43;
+  --bg-light: #f4f7fb;
+}
+
+/* ---------- GLOBAL BODY ---------- */
+body {
+  font-family: 'Inter', sans-serif;
+  background: linear-gradient(180deg, var(--bg-light) 0%, #eef2f6 100%);
+  color: var(--text-dark);
+  overflow-x: hidden;
+}
+
+/* ---------- NAVBAR ---------- */
+.navbar-glass {
+  background: linear-gradient(90deg, rgba(124,58,237,0.95), rgba(6,182,212,0.95));
+  box-shadow: 0 6px 20px rgba(16,42,67,0.12);
+  backdrop-filter: blur(8px);
+}
+
+.brand-mark {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--accent2), var(--accent1));
+}
+
+.btn-soft {
+  background: rgba(255,255,255,0.12);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+}
+
+.btn-outline {
+  border: 1px solid rgba(255,255,255,0.3);
+  color: #fff;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+}
+.btn-outline:hover {
+  background: rgba(255,255,255,0.15);
+}
+
+.btn-cta {
+  background: linear-gradient(90deg, var(--cta), #ff5722);
+  color: #fff;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+.btn-cta:hover {
+  filter: brightness(1.1);
+}
+
+/* ---------- SIDEBAR ---------- */
+.sidebar-inner {
+  background: #fff;
+  margin: 1rem;
+  border-radius: 14px;
+  padding: 1rem;
+  box-shadow: 0 8px 30px rgba(12,20,28,0.06);
+}
+
+/* Section Headings */
+.sidebar .small.text-muted {
+  font-weight: 600;
+  color: #495057 !important;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 0.5px;
+  margin-top: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+/* Sidebar Links */
+.sidebar .nav-link {
+  color: var(--muted);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  padding: 8px 14px;
+  font-weight: 500;
+}
+
+.sidebar .nav-link:hover {
+  background: linear-gradient(90deg, rgba(124,58,237,0.06), rgba(6,182,212,0.06));
+  transform: translateX(5px);
+  color: var(--accent1);
+}
+
+.sidebar .nav-link.active {
+  background: linear-gradient(90deg, var(--accent2), var(--accent1));
+  color: #fff !important;
+  font-weight: 600;
+  box-shadow: 0 3px 10px rgba(124,58,237,0.25);
+}
+
+/* ---------- MAIN CONTENT ---------- */
+.main-content {
+  padding: 2rem;
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* ---------- TABLES ---------- */
+.table-hover tbody tr:hover {
+  background: linear-gradient(90deg, rgba(124,58,237,0.05), rgba(6,182,212,0.03));
+}
+
+.table thead th {
+  color: #4a5568;
+  font-weight: 600;
+  border-bottom: 2px solid #dee2e6;
+}
+
+/* ---------- FORMS ---------- */
+.form-control {
+  border-radius: 10px;
+  transition: box-shadow 0.14s ease, border-color 0.2s;
+  border: 1px solid #ced4da;
+}
+
+.form-control:focus {
+  box-shadow: 0 0 0 3px rgba(6,182,212,0.3);
+  border-color: var(--accent2);
+}
+
+.form-label {
+  font-weight: 500;
+  color: #334e68;
+}
+
+/* ---------- UTILITIES ---------- */
+.text-gradient {
+  background: linear-gradient(90deg, var(--accent1), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.alert {
+  border-radius: 10px;
+  font-weight: 500;
+}
+
+.card {
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.card-header {
+  background: rgba(124,58,237,0.08);
+  font-weight: 600;
+  color: var(--accent1);
+}
+
+/* ---------- SCROLLBAR ---------- */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(var(--accent1), var(--accent2));
+  border-radius: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.alert {
+  border-radius: 12px;
+  font-weight: 500;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+.alert-success {
+  background: linear-gradient(90deg, #06d6a0, #1b9c85);
+  color: white;
+}
+.alert-danger {
+  background: linear-gradient(90deg, #ff6b6b, #e63946);
+  color: white;
+}

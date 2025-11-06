@@ -1,53 +1,79 @@
-{% extends 'layout.html' %}
-
+{% extends "layout.html" %}
 {% block content %}
-    <h1 class="mb-4">Place a New Order</h1>
+<div class="fade-page">
+  <h2 class="fw-bold text-gradient mb-4">Place a New Order</h2>
 
-    <div class="card">
-        <div class="card-header">
-            New Order Details
-        </div>
-        <div class="card-body">
-            
-            <!-- This form's "action" has been corrected to point to the correct function -->
-            <form action="{{ url_for('submit_order_form') }}" method="POST">
-                
-                <!-- Display success or error messages -->
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                    {% if messages %}
-                        {% for category, message in messages %}
-                            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                                {{ message }}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>
-                        {% endfor %}
-                    {% endif %}
-                {% endwith %}
+  <form method="POST" class="card p-4 shadow-sm border-0 rounded-4">
+    <div class="row g-3">
+      <div class="col-md-4">
+        <label class="form-label">Customer</label>
+        <select class="form-select" name="customer_id" required>
+          <option value="">-- Select Customer --</option>
+          {% for c in customers %}
+          <option value="{{ c.customer_id }}">{{ c.customer_name }}</option>
+          {% endfor %}
+        </select>
+      </div>
 
-                <div class="mb-3">
-                    <label for="order_id" class="form-label">Order ID (e.g., 550):</label>
-                    <input type="number" class="form-control" id="order_id" name="order_id" required>
-                </div>
-                <div class="mb-3">
-                    <label for="customer_id" class="form-label">Customer ID (e.g., 1):</label>
-                    <input type="number" class="form-control" id="customer_id" name="customer_id" required>
-                </div>
-                <div class="mb-3">
-                    <label for="vendor_id" class="form-label">Vendor ID (e.g., 101):</label>
-                    <input type="number" class="form-control" id="vendor_id" name="vendor_id" required>
-                </div>
-                <div class="mb-3">
-                    <label for="product_id" class="form-label">Product ID (e.g., 301):</label>
-                    <input type="number" class="form-control" id="product_id" name="product_id" required>
-                </div>
-                <div class="mb-3">
-                    <label for="quantity" class="form-label">Quantity:</label>
-                    <input type="number" class="form-control" id="quantity" name="quantity" required>
-                </div>
+      <div class="col-md-4">
+        <label class="form-label">Vendor</label>
+        <select id="vendorSelect" class="form-select" name="vendor_id" required>
+          <option value="">-- Select Vendor --</option>
+          {% for v in vendors %}
+          <option value="{{ v.vendor_id }}">{{ v.vendor_name }}</option>
+          {% endfor %}
+        </select>
+      </div>
 
-                <button type="submit" class="btn btn-primary">Submit Order</button>
-            </form>
-        </div>
+      <div class="col-md-4">
+        <label class="form-label">Product</label>
+        <select id="productSelect" class="form-select" name="product_id" required disabled>
+          <option value="">-- Select Vendor First --</option>
+        </select>
+      </div>
+
+      <div class="col-md-3">
+        <label class="form-label">Quantity</label>
+        <input type="number" name="quantity" min="1" class="form-control" required>
+      </div>
     </div>
-{% endblock %}
 
+    <button type="submit" class="btn btn-primary mt-4">Place Order</button>
+  </form>
+</div>
+
+<!-- JS to dynamically load products based on vendor -->
+<script>
+document.getElementById("vendorSelect").addEventListener("change", function() {
+  const vendorId = this.value;
+  const productSelect = document.getElementById("productSelect");
+
+  productSelect.innerHTML = '<option>Loading...</option>';
+  productSelect.disabled = true;
+
+  if (vendorId) {
+    fetch(`/get_vendor_products/${vendorId}`)
+      .then(response => response.json())
+      .then(data => {
+        productSelect.innerHTML = "";
+        if (data.length === 0) {
+          productSelect.innerHTML = '<option value="">No products in stock</option>';
+        } else {
+          productSelect.innerHTML = '<option value="">-- Select Product --</option>';
+          data.forEach(item => {
+            const option = document.createElement("option");
+            option.value = item.product_id;
+            option.textContent = `${item.product_name} — ₹${item.product_price} (Stock: ${item.product_quantity})`;
+            productSelect.appendChild(option);
+          });
+        }
+        productSelect.disabled = false;
+      })
+      .catch(err => {
+        console.error("Error fetching products:", err);
+        productSelect.innerHTML = '<option>Error loading products</option>';
+      });
+  }
+});
+</script>
+{% endblock %}

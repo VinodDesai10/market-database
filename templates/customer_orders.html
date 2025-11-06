@@ -1,86 +1,138 @@
 {% extends "layout.html" %}
-
 {% block content %}
-<h1 class="mb-4">Customer Order History</h1>
+<div class="fade-page">
 
-<!-- Search Bar -->
-<div class="row justify-content-center mb-4">
-    <div class="col-md-8">
-        <div class="card">
-            <div class="card-body">
-                <form action="{{ url_for('customer_orders') }}" method="POST">
-                    <div class="input-group">
-                        <!-- THIS IS THE FIX: The name="search_term" attribute is required -->
-                        <input type="text" class="form-control" 
-                               placeholder="Enter Customer ID or Name..." 
-                               name="search_term" 
-                               id="search_term" 
-                               aria-label="Customer search query">
-                        <button class="btn btn-primary" type="submit">Search</button>
-                    </div>
-                </form>
-            </div>
-        </div>
+  <!-- 🔍 SEARCH SECTION -->
+  <div class="card border-0 shadow-sm p-4 mb-4 rounded-4">
+    <h4 class="fw-bold text-gradient mb-3">Search Customer Orders</h4>
+    <form id="searchForm" class="row g-3 align-items-end">
+      <div class="col-md-10">
+        <label for="search_input" class="form-label">Enter Customer ID or Name</label>
+        <input type="text" class="form-control" id="search_input" placeholder="e.g. 5 or Aarav Sharma">
+      </div>
+      <div class="col-md-2 d-flex align-items-end">
+        <button type="submit" class="btn btn-cta w-100">Search</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- 📋 SEARCH RESULTS -->
+  <div id="searchResults" class="card border-0 shadow-sm p-4 rounded-4 mb-5" style="display:none;">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="fw-bold text-gradient mb-0">Customer Order Details</h5>
+      <button id="showAllBtn" class="btn btn-soft small-btn">Show All Orders</button>
     </div>
+        <h4 id="customerNameDisplay"
+            class="fw-bold text-gradient mb-3"
+            style="display:none; font-size: 1.4rem;">
+        </h4>
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-3">
+        <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>Date</th>
+            <th>Items</th>
+            <th>Vendor</th>
+            <th>Amount (₹)</th>
+          </tr>
+        </thead>
+        <tbody id="resultTableBody"></tbody>
+      </table>
+    </div>
+    <div class="text-end fw-bold fs-5">
+      Total Order Amount: ₹<span id="totalAmount">0</span>
+    </div>
+  </div>
+
+  <!-- 📦 ALL ORDERS (Default View) -->
+  <div id="allOrders" class="card border-0 shadow-sm p-4 rounded-4">
+    <h4 class="fw-bold text-gradient mb-3">All Customer Orders</h4>
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>Customer</th>
+            <th>Vendor</th>
+            <th>Date</th>
+            <th>Items</th>
+            <th>Amount (₹)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for order in orders %}
+          <tr>
+            <td>{{ order.order_id }}</td>
+            <td>{{ order.customer_name }}</td>
+            <td>{{ order.vendor_name }}</td>
+            <td>{{ order.order_date }}</td>
+            <td>{{ order.order_item }}</td>
+            <td>{{ order.order_amount }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>
 
-<!-- Results Area -->
-{% if customer %}
-    <!-- Customer Details Card -->
-    <div class="card mb-4">
-        <div class="card-header">
-            Showing Results for: {{ customer.customer_name }}
-        </div>
-        <div class="card-body">
-            <h5 class="card-title">{{ customer.customer_name }}</h5>
-            <p class="card-text">
-                <strong>Customer ID:</strong> {{ customer.customer_id }}<br>
-                <strong>Address:</strong> {{ customer.customer_address }}
-            </p>
-        </div>
-        <div class="card-footer text-end">
-            <strong>Total Spent: <span class="text-success">₹{{ "%.2f"|format(total_spent) }}</span></strong>
-        </div>
-    </div>
+<!-- 🧠 Inline Script for Dynamic Search -->
+<script>
+document.getElementById("searchForm").addEventListener("submit", async function(e) {
+  e.preventDefault();
 
-    <!-- Orders Table -->
-    <h3 class="mb-3">Orders</h3>
-    <div class="card">
-        <div class="card-body p-0">
-            <table class="table table-striped table-hover mb-0">
-                <thead class="table-dark">
-                    <tr>
-                        <th scope="col">Order ID</th>
-                        <th scope="col">Date</th>
-                        <th scope="col">Items</th>
-                        <th scope="col">Sold By</th>
-                        <th scope="col" class="text-end">Amount</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for order in orders %}
-                    <tr>
-                        <th scope="row">{{ order.order_id }}</th>
-                        <td>{{ order.order_date }}</td>
-                        <td>{{ order.order_item }}</td>
-                        <td>{{ order.vendor_name }}</td>
-                        <td class="text-end">₹{{ "%.2f"|format(order.order_amount) }}</td>
-                    </tr>
-                    {% else %}
-                    <tr>
-                        <td colspan="5" class="text-center">This customer has no orders.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
+  const input = document.getElementById("search_input").value.trim();
+  if (!input) {
+    alert("Please enter a customer ID or name");
+    return;
+  }
 
-{% elif request.method == 'POST' %}
-    <!-- Show this if a search was made but no customer was found -->
-    <div class="alert alert-warning" role="alert">
-        No customer found for your search.
-    </div>
-{% endif %}
+  try {
+    const res = await fetch(`/search_orders?query=${encodeURIComponent(input)}`);
+    const data = await res.json();
 
+    const tbody = document.getElementById("resultTableBody");
+    const nameDisplay = document.getElementById("customerNameDisplay");
+    tbody.innerHTML = "";
+
+    if (data.orders.length === 0) {
+      tbody.innerHTML = "<tr><td colspan='5' class='text-center text-muted'>No orders found</td></tr>";
+      nameDisplay.style.display = "none";
+      document.getElementById("totalAmount").textContent = "0";
+    } else {
+      let total = 0;
+      nameDisplay.style.display = "block";
+      nameDisplay.textContent = `${data.orders[0].customer_name}`;
+
+      data.orders.forEach(order => {
+        const row = `<tr>
+          <td>${order.order_id}</td>
+          <td>${order.order_date}</td>
+          <td>${order.order_item}</td>
+          <td>${order.vendor_name}</td>
+          <td>${order.order_amount}</td>
+        </tr>`;
+        tbody.insertAdjacentHTML("beforeend", row);
+        total += order.order_amount;
+      });
+
+      document.getElementById("totalAmount").textContent = total.toLocaleString();
+    }
+
+    document.getElementById("searchResults").style.display = "block";
+    document.getElementById("allOrders").style.display = "none";
+
+  } catch (err) {
+    console.error("Search failed:", err);
+    alert("Error fetching data. Please try again.");
+  }
+});
+
+document.getElementById("showAllBtn").addEventListener("click", function() {
+  document.getElementById("searchResults").style.display = "none";
+  document.getElementById("allOrders").style.display = "block";
+  document.getElementById("search_input").value = "";
+});
+</script>
 {% endblock %}

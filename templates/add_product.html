@@ -1,49 +1,47 @@
-{% extends 'layout.html' %}
-
+{% extends "layout.html" %}
 {% block content %}
-    <h1 class="mb-4">Add New Product</h1>
+<div class="fade-page">
+  <div class="card border-0 shadow-sm p-4 rounded-4">
+    <h4 class="fw-bold text-gradient mb-4">Add New Product</h4>
 
-    <!-- Flash messages for success or error -->
     {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endfor %}
-        {% endif %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
     {% endwith %}
 
-    <div class="card">
-        <div class="card-header">
-            Enter Product Details
-        </div>
-        <div class="card-body">
-            <form action="{{ url_for('add_product') }}" method="POST">
-                <div class="mb-3">
-                    <label for="product_id" class="form-label">Product ID</label>
-                    <input type="number" class="form-control" id="product_id" name="product_id" required>
-                </div>
-                <div class="mb-3">
-                    <label for="product_name" class="form-label">Product Name</label>
-                    <input type="text" class="form-control" id="product_name" name="product_name" required>
-                </div>
-                <div class="mb-3">
-                    <label for="category" class="form-label">Category</label>
-                    <input type="text" class="form-control" id="category" name="category" required>
-                </div>
-                <div class="mb-3">
-                    <label for="product_quantity" class="form-label">Initial Quantity (Total)</label>
-                    <input type="number" class="form-control" id="product_quantity" name="product_quantity" required>
-                </div>
-                 <div class="mb-3">
-                    <label for="product_price" class="form-label">Product Price (₹)</label>
-                    <input type="number" class="form-control" id="product_price" name="product_price" required>
-                </div>
-                <button type="submit" class="btn btn-primary">Add Product</button>
-            </form>
-        </div>
-    </div>
-{% endblock %}
+    <form method="POST" action="{{ url_for('add_product') }}" class="row g-3">
+      <div class="col-md-3">
+        <label for="product_id" class="form-label fw-semibold">Product ID</label>
+        <input type="number" class="form-control" id="product_id" name="product_id" required>
+      </div>
+      <div class="col-md-5">
+        <label for="name" class="form-label fw-semibold">Product Name</label>
+        <input type="text" class="form-control" id="name" name="name" required>
+      </div>
+      <div class="col-md-2">
+        <label for="category" class="form-label fw-semibold">Category</label>
+        <input type="text" class="form-control" id="category" name="category" required>
+      </div>
+      <div class="col-md-2">
+        <label for="price" class="form-label fw-semibold">Price (₹)</label>
+        <input type="number" class="form-control" id="price" name="price" required>
+      </div>
 
+      <div class="col-md-3">
+        <label for="quantity" class="form-label fw-semibold">Initial Quantity</label>
+        <input type="number" class="form-control" id="quantity" name="quantity" required>
+      </div>
+
+      <div class="col-12 text-end">
+        <button type="submit" class="btn btn-cta px-4">Add Product</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

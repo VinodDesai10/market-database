@@ -1,49 +1,47 @@
-{% extends 'layout.html' %}
-
+{% extends "layout.html" %}
 {% block content %}
-    <h1 class="mb-4">Add New Vendor</h1>
+<div class="fade-page">
+  <div class="card border-0 shadow-sm p-4 rounded-4">
+    <h4 class="fw-bold text-gradient mb-4">Add New Vendor</h4>
 
-    <!-- Flash messages for success or error -->
+    <!-- Flash messages -->
     {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endfor %}
-        {% endif %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
     {% endwith %}
 
-    <div class="card">
-        <div class="card-header">
-            Enter Vendor Details
-        </div>
-        <div class="card-body">
-            <form action="{{ url_for('add_vendor') }}" method="POST">
-                <div class="mb-3">
-                    <label for="vendor_id" class="form-label">Vendor ID</label>
-                    <input type="number" class="form-control" id="vendor_id" name="vendor_id" required>
-                </div>
-                <div class="mb-3">
-                    <label for="vendor_name" class="form-label">Vendor Name</label>
-                    <input type="text" class="form-control" id="vendor_name" name="vendor_name" required>
-                </div>
-                <div class="mb-3">
-                    <label for="vendor_email" class="form-label">Email</label>
-                    <input type="email" class="form-control" id="vendor_email" name="vendor_email" required>
-                </div>
-                 <div class="mb-3">
-                    <label for="vendor_pancard" class="form-label">PAN Card</label>
-                    <input type="text" class="form-control" id="vendor_pancard" name="vendor_pancard" required>
-                </div>
-                 <div class="mb-3">
-                    <label for="vendor_phone_number" class="form-label">Phone Number</label>
-                    <input type="text" class="form-control" id="vendor_phone_number" name="vendor_phone_number" required>
-                </div>
-                <button type="submit" class="btn btn-primary">Add Vendor</button>
-            </form>
-        </div>
-    </div>
-{% endblock %}
+    <form method="POST" action="{{ url_for('add_vendor') }}" class="row g-3">
+      <div class="col-md-4">
+        <label for="vendor_id" class="form-label fw-semibold">Vendor ID</label>
+        <input type="number" class="form-control" id="vendor_id" name="vendor_id" required>
+      </div>
+      <div class="col-md-8">
+        <label for="name" class="form-label fw-semibold">Vendor Name</label>
+        <input type="text" class="form-control" id="name" name="name" required>
+      </div>
+      <div class="col-md-6">
+        <label for="email" class="form-label fw-semibold">Email</label>
+        <input type="email" class="form-control" id="email" name="email" required>
+      </div>
+      <div class="col-md-6">
+        <label for="pancard" class="form-label fw-semibold">PAN Card</label>
+        <input type="text" class="form-control" id="pancard" name="pancard" required>
+      </div>
+      <div class="col-md-12">
+        <label for="phone_number" class="form-label fw-semibold">Phone Number</label>
+        <input type="text" class="form-control" id="phone_number" name="phone_number" required>
+      </div>
 
+      <div class="col-12 text-end">
+        <button type="submit" class="btn btn-cta px-4">Add Vendor</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,42 +1,32 @@
-{% extends 'layout.html' %}
-
+{% extends "layout.html" %}
 {% block content %}
-    <h1 class="mb-4">Customers List</h1>
+<div class="fade-page">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold text-gradient">Customers Overview</h2>
+    <a href="{{ url_for('add_customer') }}" class="btn btn-primary shadow-sm">+ Add Customer</a>
+  </div>
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
-
-    <div class="card">
-        <div class="card-header">
-            All Registered Customers
-        </div>
-        <div class="card-body p-0">
-            <table class="table table-striped table-hover mb-0">
-                <thead class="table-dark">
-                    <tr>
-                        <th scope="col">Customer ID</th>
-                        <th scope="col">Name</th>
-                        <th scope="col">Address</th>
-                        </tr>
-                </thead>
-                <tbody>
-                    {% for customer in customers %}
-                    <tr>
-                        <th scope="row">{{ customer.customer_id }}</th>
-                        <td>{{ customer.customer_name }}</td>
-                        <td>{{ customer.customer_address }}</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+  <div class="card p-3 border-0 shadow-sm rounded-4">
+    <div class="card-body">
+      <table class="table table-hover align-middle">
+        <thead>
+          <tr>
+            <th>Customer ID</th>
+            <th>Name</th>
+            <th>Address</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for customer in customers %}
+          <tr>
+            <td>{{ customer.customer_id }}</td>
+            <td>{{ customer.customer_name }}</td>
+            <td>{{ customer.customer_address }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
+  </div>
+</div>
 {% endblock %}

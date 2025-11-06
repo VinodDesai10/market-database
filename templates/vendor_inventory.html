@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="fade-page">
+  <h2 class="fw-bold text-gradient mb-4">Vendor Inventory</h2>
+
+  {% if grouped_inventory %}
+  {% for vendor, items in grouped_inventory.items() %}
+  <div class="card mb-4 shadow-sm border-0 rounded-4">
+    <div class="card-header bg-light fw-semibold">
+      {{ vendor }}
+    </div>
+    <div class="card-body p-0">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Product Name</th>
+            <th>Quantity</th>
+            <th>Last Update</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in items %}
+          <tr>
+            <td>{{ item.product_name }}</td>
+            <td>
+              <div class="d-flex align-items-center">
+                <div class="progress flex-grow-1 me-2" style="height: 10px;">
+                  {% set percent = (item.product_quantity / 500) * 100 %}
+                  <div class="progress-bar bg-success" style="width: {{ percent if percent <= 100 else 100 }}%;"></div>
+                </div>
+                <small>{{ item.product_quantity }}</small>
+              </div>
+            </td>
+            <td>{{ item.last_update }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% endfor %}
+  {% else %}
+  <p class="text-muted">No inventory data available.</p>
+  {% endif %}
+</div>
+{% endblock %}

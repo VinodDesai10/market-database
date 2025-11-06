@@ -1,9 +1,9 @@
 {% extends "layout.html" %}
 {% block content %}
 <div class="fade-page">
-  <h2 class="fw-bold text-gradient mb-4">Update Records</h2>
+  <h2 class="fw-bold text-gradient mb-4">Delete Records</h2>
 
-  <!-- Step 1: Choose Category -->
+  <!-- Step 1: Select Category & Search -->
   <form method="POST" class="card p-4 shadow-sm border-0 rounded-4 mb-4">
     <div class="row g-3 align-items-end">
       <div class="col-md-4">
@@ -16,40 +16,49 @@
           <option value="Product" {% if category=='Product' %}selected{% endif %}>Product</option>
         </select>
       </div>
+
       <div class="col-md-6">
         <label class="form-label">Search by ID or Name</label>
         <input type="text" name="search" class="form-control" placeholder="Enter ID or Name">
       </div>
+
       <div class="col-md-2">
         <button type="submit" name="search" class="btn btn-primary w-100">Search</button>
       </div>
     </div>
   </form>
 
-  {% if search_results %}
+  {% if results %}
   <div class="card shadow-sm border-0 rounded-4">
     <div class="card-body">
       <h5 class="fw-bold text-gradient mb-3">{{ category }} Results</h5>
 
-      {% for record in search_results %}
-      <form method="POST" class="border p-3 rounded-3 mb-3 bg-light">
-        <input type="hidden" name="category" value="{{ category }}">
-        <input type="hidden" name="record_id" value="{{ record[category.lower() + '_id'] }}">
-
-        <div class="row g-3">
-          {% for key, value in record.items() %}
-            {% if '_id' not in key %}
-            <div class="col-md-4">
-              <label class="form-label">{{ key.replace('_', ' ').title() }}</label>
-              <input type="text" class="form-control" name="{{ key }}" value="{{ value }}">
-            </div>
-            {% endif %}
+      <table class="table table-hover align-middle">
+        <thead>
+          <tr>
+            {% for key in results[0].keys() %}
+            <th>{{ key.replace('_', ' ').title() }}</th>
+            {% endfor %}
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in results %}
+          <tr>
+            {% for val in r.values() %}
+            <td>{{ val }}</td>
+            {% endfor %}
+            <td>
+              <form method="POST" onsubmit="return confirm('Are you sure you want to delete this {{ category|lower }}?');">
+                <input type="hidden" name="category" value="{{ category }}">
+                <input type="hidden" name="delete_id" value="{{ r[category.lower() + '_id'] }}">
+                <button type="submit" name="delete" class="btn btn-outline-danger btn-sm">Delete</button>
+              </form>
+            </td>
+          </tr>
           {% endfor %}
-        </div>
-
-        <button type="submit" name="update" class="btn btn-primary mt-3">Save Changes</button>
-      </form>
-      {% endfor %}
+        </tbody>
+      </table>
     </div>
   </div>
   {% endif %}
