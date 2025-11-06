@@ -6,13 +6,11 @@ app = Flask(__name__)
 app.secret_key = 'your_super_secret_key'  # Needed for flash messages
 
 # --- 2. CONFIGURE YOUR DATABASE CONNECTION ---
-# !!! IMPORTANT !!!
-# Replace these values with your OWN MySQL credentials.
 DB_CONFIG = {
     'host': 'localhost',        # Or your MySQL server's IP address
     'user': 'root',             # Your MySQL username
     'password': 'Vinod123@',    # Your MySQL password
-    'database': 'Market'     # The name of your database
+    'database': 'Market'     # The name of your database (confirmed from your screenshot)
 }
 
 # --- 3. DATABASE CONNECTION FUNCTION ---
@@ -102,7 +100,8 @@ def customer_orders():
     total_spent = 0
 
     if request.method == 'POST':
-        search_term = request.form['search_query']
+        # This name must match the 'name' attribute in the customer_orders.html form
+        search_term = request.form['search_term'] 
         conn = get_db_connection()
         if not conn:
             return "<h1>Error: Could not connect to the database.</h1>", 500
@@ -111,7 +110,14 @@ def customer_orders():
         
         # Find the customer
         query_customer = "SELECT * FROM customers WHERE customer_id = %s OR customer_name LIKE %s"
-        cursor.execute(query_customer, (search_term, f"%{search_term}%"))
+        try:
+            # Try to convert search_term to int for ID search
+            customer_id_search = int(search_term)
+        except ValueError:
+            # If not an int, set ID search to a value that won't match (like -1)
+            customer_id_search = -1
+
+        cursor.execute(query_customer, (customer_id_search, f"%{search_term}%"))
         customer = cursor.fetchone()
         
         if customer:
@@ -371,7 +377,239 @@ def add_product():
     return render_template('add_product.html')
 
 
-# --- 7. RUN THE APPLICATION ---
+# --- 7. "UPDATE" WORKFLOW (This is the new section) ---
+
+@app.route('/update', methods=['GET', 'POST'])
+def update_search():
+    """
+    This is the new search page you requested.
+    It takes a type (e.g., 'customer') and an ID, then redirects 
+    to the correct edit form for that item.
+    """
+    if request.method == 'POST':
+        item_type = request.form.get('item_type')
+        item_id = request.form.get('item_id')
+
+        if not item_id:
+            flash('Please enter an ID.', 'warning')
+            return redirect(url_for('update_search'))
+
+        # Based on the dropdown, redirect to the correct edit function
+        if item_type == 'customer':
+            return redirect(url_for('edit_customer_form', id=item_id))
+        elif item_type == 'vendor':
+            return redirect(url_for('edit_vendor_form', id=item_id))
+        elif item_type == 'farmer':
+            return redirect(url_for('edit_farmer_form', id=item_id))
+        elif item_type == 'product':
+            return redirect(url_for('edit_product_form', id=item_id))
+        else:
+            flash('Invalid item type selected.', 'danger')
+            return redirect(url_for('update_search'))
+
+    # If GET request, just show the search page
+    return render_template('update_search.html')
+
+
+# --- 7a. Edit and Update Customer ---
+@app.route('/customer/edit/<int:id>', methods=['GET'])
+def edit_customer_form(id):
+    """Shows the form to edit an existing customer, pre-filled with their data."""
+    conn = get_db_connection()
+    if not conn:
+        return "<h1>Error: Could not connect to the database.</h1>", 500
+    
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM customers WHERE customer_id = %s", (id,))
+    customer = cursor.fetchone()
+    cursor.close()
+    conn.close()
+    
+    if not customer:
+        flash(f'Customer with ID {id} not found!', 'danger')
+        return redirect(url_for('update_search'))
+        
+    return render_template('edit_customer.html', customer=customer)
+
+@app.route('/customer/update/<int:id>', methods=['POST'])
+def update_customer(id):
+    """Processes the submission from the edit customer form."""
+    if request.method == 'POST':
+        # Get data from form
+        name = request.form['customer_name']
+        address = request.form['customer_address']
+        
+        conn = get_db_connection()
+        if not conn:
+            return "<h1>Error: Could not connect to the database.</h1>", 500
+        
+        try:
+            cursor = conn.cursor()
+            query = "UPDATE customers SET customer_name = %s, customer_address = %s WHERE customer_id = %s"
+            cursor.execute(query, (name, address, id))
+            conn.commit()
+            flash('Customer updated successfully!', 'success')
+        except mysql.connector.Error as err:
+            conn.rollback()
+            flash(f'Error updating customer: {err.msg}', 'danger')
+        finally:
+            cursor.close()
+            conn.close()
+        
+        # Redirect back to the main customers list
+        return redirect(url_for('index'))
+
+
+# --- 7b. Edit and Update Vendor ---
+@app.route('/vendor/edit/<int:id>', methods=['GET'])
+def edit_vendor_form(id):
+    """Shows the form to edit an existing vendor."""
+    conn = get_db_connection()
+    if not conn: return "<h1>Error: Could not connect to the database.</h1>", 500
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM vendors WHERE vendor_id = %s", (id,))
+    vendor = cursor.fetchone()
+    cursor.close()
+    conn.close()
+    if not vendor:
+        flash(f'Vendor with ID {id} not found!', 'danger')
+        return redirect(url_for('update_search'))
+    return render_template('edit_vendor.html', vendor=vendor)
+
+@app.route('/vendor/update/<int:id>', methods=['POST'])
+def update_vendor(id):
+    """Processes the submission from the edit vendor form."""
+    if request.method == 'POST':
+        conn = get_db_connection()
+        if not conn: return "<h1>Error: Could not connect to the database.</h1>", 500
+        try:
+            cursor = conn.cursor()
+            query = """
+                UPDATE vendors SET 
+                    vendor_name = %s, 
+                    vendor_email = %s, 
+                    vendor_pancard = %s, 
+                    vendor_phone_number = %s
+                WHERE vendor_id = %s
+            """
+            args = (
+                request.form['vendor_name'],
+                request.form['vendor_email'],
+                request.form['vendor_pancard'],
+                request.form['vendor_phone'],
+                id
+            )
+            cursor.execute(query, args)
+            conn.commit()
+            flash('Vendor updated successfully!', 'success')
+        except mysql.connector.Error as err:
+            conn.rollback()
+            flash(f'Error updating vendor: {err.msg}', 'danger')
+        finally:
+            cursor.close()
+            conn.close()
+        return redirect(url_for('vendors_list'))
+
+# --- 7c. Edit and Update Farmer ---
+@app.route('/farmer/edit/<int:id>', methods=['GET'])
+def edit_farmer_form(id):
+    """Shows the form to edit an existing farmer."""
+    conn = get_db_connection()
+    if not conn: return "<h1>Error: Could not connect to the database.</h1>", 500
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM farmers WHERE farmer_id = %s", (id,))
+    farmer = cursor.fetchone()
+    cursor.close()
+    conn.close()
+    if not farmer:
+        flash(f'Farmer with ID {id} not found!', 'danger')
+        return redirect(url_for('update_search'))
+    return render_template('edit_farmer.html', farmer=farmer)
+
+@app.route('/farmer/update/<int:id>', methods=['POST'])
+def update_farmer(id):
+    """Processes the submission from the edit farmer form."""
+    if request.method == 'POST':
+        conn = get_db_connection()
+        if not conn: return "<h1>Error: Could not connect to the database.</h1>", 500
+        try:
+            cursor = conn.cursor()
+            query = """
+                UPDATE farmers SET 
+                    farmer_name = %s, 
+                    farmer_phone_number = %s, 
+                    farmer_address = %s
+                WHERE farmer_id = %s
+            """
+            args = (
+                request.form['farmer_name'],
+                request.form['farmer_phone'],
+                request.form['farmer_address'],
+                id
+            )
+            cursor.execute(query, args)
+            conn.commit()
+            flash('Farmer updated successfully!', 'success')
+        except mysql.connector.Error as err:
+            conn.rollback()
+            flash(f'Error updating farmer: {err.msg}', 'danger')
+        finally:
+            cursor.close()
+            conn.close()
+        return redirect(url_for('farmers_list'))
+
+# --- 7d. Edit and Update Product ---
+@app.route('/product/edit/<int:id>', methods=['GET'])
+def edit_product_form(id):
+    """Shows the form to edit an existing product."""
+    conn = get_db_connection()
+    if not conn: return "<h1>Error: Could not connect to the database.</h1>", 500
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM products WHERE product_id = %s", (id,))
+    product = cursor.fetchone()
+    cursor.close()
+    conn.close()
+    if not product:
+        flash(f'Product with ID {id} not found!', 'danger')
+        return redirect(url_for('update_search'))
+    return render_template('edit_product.html', product=product)
+
+@app.route('/product/update/<int:id>', methods=['POST'])
+def update_product(id):
+    """Processes the submission from the edit product form."""
+    if request.method == 'POST':
+        conn = get_db_connection()
+        if not conn:
+            return "<h1>Error: Could not connect to the database.</h1>", 500
+        try:
+            cursor = conn.cursor()
+            query = """
+                UPDATE products SET 
+                    product_name = %s, 
+                    category = %s, 
+                    product_quantity = %s, 
+                    product_price = %s
+                WHERE product_id = %s
+            """
+            args = (
+                request.form['product_name'],
+                request.form['category'],
+                request.form['quantity'],
+                request.form['price'],
+                id
+            )
+            cursor.execute(query, args)
+            conn.commit()
+            flash('Product updated successfully!', 'success')
+        except mysql.connector.Error as err:
+            conn.rollback()
+            flash(f'Error updating product: {err.msg}', 'danger')
+        finally:
+            cursor.close()
+            conn.close()
+        return redirect(url_for('products_list'))
+
+
+# --- 8. RUN THE APPLICATION ---
 if __name__ == '__main__':
     app.run(debug=True)
-

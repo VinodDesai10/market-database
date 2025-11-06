@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                Find Item to Update
+            </div>
+            <div class="card-body">
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <form action="{{ url_for('update_search') }}" method="POST">
+                    <div class="mb-3">
+                        <label for="item_type" class="form-label">What do you want to update?</label>
+                        <select class="form-select" id="item_type" name="item_type">
+                            <option value="customer">Customer</option>
+                            <option value="vendor">Vendor</option>
+                            <option value="farmer">Farmer</option>
+                            <option value="product">Product</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="item_id" class="form-label">Enter the Item ID:</label>
+                        <input type="number" class="form-control" id="item_id" name="item_id" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Find Item</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

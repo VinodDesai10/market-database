@@ -1,0 +1,37 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                Edit Farmer (ID: {{ farmer.farmer_id }})
+            </div>
+            <div class="card-body">
+                <form action="{{ url_for('update_farmer', id=farmer.farmer_id) }}" method="POST">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Farmer ID</label>
+                            <input type="text" class="form-control" value="{{ farmer.farmer_id }}" disabled>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="farmer_name" class="form-label">Farmer Name</label>
+                            <input type="text" class="form-control" id="farmer_name" name="farmer_name" value="{{ farmer.farmer_name }}" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="farmer_phone" class="form-label">Phone Number</label>
+                        <input type="text" class="form-control" id="farmer_phone" name="farmer_phone" value="{{ farmer.farmer_phone_number }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="farmer_address" class="form-label">Address</label>
+                        <input type="text" class="form-control" id="farmer_address" name="farmer_address" value="{{ farmer.farmer_address }}">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                    <a href="{{ url_for('farmers_list') }}" class="btn btn-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
