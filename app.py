@@ -1,17 +1,20 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 import mysql.connector
 from flask import jsonify
+import os
+from dotenv import load_dotenv
 
 app = Flask(__name__)
-app.secret_key = "your_secret_key"
+app.secret_key = os.getenv("SECRET_KEY")
 
+load_dotenv("credentials.env")
 # --- Database connection helper ---
 def get_db_connection():
     conn = mysql.connector.connect(
-        host="localhost",       # Change if using another host
-        user="root",            # Your MySQL username
-        password="Vinod123@",  # 🔹 Replace with your actual MySQL password
-        database="market"       # Your MySQL database name
+        host=os.getenv("DB_HOST"),
+        user=os.getenv("DB_USER"),
+        password=os.getenv("DB_PASSWORD"),
+        database=os.getenv("DB_NAME")       # Your MySQL database name
     )
     return conn
 
